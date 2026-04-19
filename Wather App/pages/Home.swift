@@ -2,10 +2,12 @@
 import UIKit
 
 class MinhaViewController: UIViewController {
+   
     
-    private var primaryColor = UIColor(named: "primaryColor")
-    private var contrastColor = UIColor(named: "contrastColor")
-    private var softGray = UIColor(named: "softgray")
+    
+    private var primaryColor = UIColor.primaryColor
+    private var contrastColor = UIColor.contrastColor
+    private var softGray = UIColor.softGray
     
     private lazy var backgroundView: UIImageView = {
         
@@ -25,6 +27,56 @@ class MinhaViewController: UIViewController {
         view.layer.cornerRadius = 20
         
         return view
+    }()
+    
+   
+    
+    
+    private lazy var cityLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        label.font = UIFont.systemFont(ofSize: 20)
+        label.text = "São Paulo"
+        label.textAlignment = .center
+        label.textColor = primaryColor
+        
+        return label
+    }()
+    
+    private lazy var tempLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        label.font = UIFont.systemFont(ofSize: 70, weight: .bold)
+        label.text = "25°C"
+        label.textAlignment = .left
+        label.textColor = primaryColor
+        
+        return label
+    }()
+    
+    private lazy var HourlyForecastLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        label.font = UIFont.systemFont(ofSize: 12,weight: .bold)
+        label.text = "PREVISÃO POR HORA"
+        label.textAlignment = .center
+        label.textColor = contrastColor
+        
+        return label
+    }()
+    
+    private lazy var weatherIcon: UIImageView = {
+        
+        let uIImageView = UIImageView()
+        uIImageView.image = UIImage(named: "sunIcon")
+        uIImageView.contentMode = .scaleAspectFit
+        uIImageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        
+        return uIImageView
     }()
     
     private lazy var statsStackView: UIStackView = {
@@ -54,42 +106,6 @@ class MinhaViewController: UIViewController {
         
         stackView.layer.cornerRadius = 20
         return stackView
-    }()
-    
-    
-    private lazy var cityLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        label.font = UIFont.systemFont(ofSize: 20)
-        label.text = "São Paulo"
-        label.textAlignment = .center
-        label.textColor = primaryColor
-        
-        return label
-    }()
-    
-    private lazy var tempLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        label.font = UIFont.systemFont(ofSize: 70, weight: .bold)
-        label.text = "25°C"
-        label.textAlignment = .left
-        label.textColor = primaryColor
-        
-        return label
-    }()
-    
-    private lazy var weatherIcon: UIImageView = {
-        
-        let uIImageView = UIImageView()
-        uIImageView.image = UIImage(named: "sunIcon")
-        uIImageView.contentMode = .scaleAspectFit
-        uIImageView.translatesAutoresizingMaskIntoConstraints = false
-        
-        
-        return uIImageView
     }()
     
     private lazy var humidityLabel: UILabel = {
@@ -127,6 +143,19 @@ class MinhaViewController: UIViewController {
         label.textColor = contrastColor
         return label
     }()
+    
+    private lazy var hourlyCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.itemSize = CGSize(width: 67, height: 84)
+        layout.sectionInset = UIEdgeInsets(top: .zero, left: 12, bottom: .zero, right: 12)
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = .clear
+        collectionView.dataSource = self
+        collectionView.register(HourlyForecastCollectionViewCell.self, forCellWithReuseIdentifier: HourlyForecastCollectionViewCell.indetifier)
+        return collectionView
+    }()
 
     //Quando a tela carrega
     override func viewDidLoad() {
@@ -147,6 +176,8 @@ class MinhaViewController: UIViewController {
         view.addSubview(backgroundView)
         view.addSubview(headerView)
         view.addSubview(statsStackView)
+        view.addSubview(HourlyForecastLabel)
+        view.addSubview(hourlyCollectionView)
         
         headerView.addSubview(cityLabel)
         headerView.addSubview(tempLabel)
@@ -186,7 +217,30 @@ class MinhaViewController: UIViewController {
             weatherIcon.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -26),
             
         ])
+        
+        NSLayoutConstraint.activate([
+            HourlyForecastLabel.topAnchor.constraint(equalTo: statsStackView.bottomAnchor, constant: 29),
+            HourlyForecastLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 35),
+            HourlyForecastLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -35),
+            hourlyCollectionView.topAnchor.constraint(equalTo: HourlyForecastLabel.bottomAnchor, constant: 22),
+            hourlyCollectionView.heightAnchor.constraint(equalToConstant: 84),
+            hourlyCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            hourlyCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+     
      
     }
+}
+
+extension MinhaViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 10
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HourlyForecastCollectionViewCell.indetifier, for: indexPath)
+        return cell
+    }
+    
 }
 #endif
