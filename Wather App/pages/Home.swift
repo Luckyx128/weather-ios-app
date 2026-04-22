@@ -182,12 +182,19 @@ class MinhaViewController: UIViewController {
         
         
     }()
+    
+    private let service = Service()
+    
 
     //Quando a tela carrega
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupView()
+        
+        service.fetchData(city: City(lat: "-23.6814346", lon: "-46.9249599", name: "São Paulo")) {
+            message in print(message)
+        }
         
     }
     
